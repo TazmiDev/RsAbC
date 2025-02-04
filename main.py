@@ -5,7 +5,14 @@ import tkinter as tk
 from tkinter import ttk
 import importlib
 import os
+import logging
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename='rsa_tool.log',
+    filemode='w'
+)
 
 def get_base_path():
     if getattr(sys, 'frozen', False):
@@ -65,6 +72,7 @@ class RSADecryptTool:
         self.param_frame = None
         self.attack_var = None
         self.result_text = None
+        self.theme_var = tk.StringVar(value="alt")  # 移到这里
         self.master = master
         master.title("RsAbC v1.0")
         master.geometry("800x600")
@@ -78,24 +86,61 @@ class RSADecryptTool:
 
         configure_style()
         # 添加图标
-        if os.path.exists("assets/app.ico"):
-            master.iconbitmap("assets/app.ico")
+        if os.path.exists("assets/app.png"):
+            master.iconbitmap("assets/app.png")
 
     def create_widgets(self):
         # 主题样式
         style = ttk.Style()
-        style.theme_use("clam")
+        style.theme_use("alt")
 
         # 主框架
         main_frame = ttk.Frame(self.master)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # 左上角工具栏
+        toolbar_frame = ttk.Frame(main_frame)
+        toolbar_frame.pack(side=tk.TOP, anchor=tk.NW)
+
+        # 跳转GitHub按钮
+        github_icon_path = "assets/github.png"
+        if os.path.exists(github_icon_path):
+            github_icon = tk.PhotoImage(file=github_icon_path)
+            github_button = tk.Button(
+                toolbar_frame,
+                image=github_icon,
+                command=self.open_github,
+                bg="white",
+                width=30,
+                height=30
+            )
+            github_button.image = github_icon  # 保持引用
+            github_button.pack(side=tk.LEFT, padx=5)
+        else:
+            github_button = ttk.Button(
+                toolbar_frame,
+                text="GitHub",
+                command=self.open_github,
+                style="primary.TButton"
+            )
+            github_button.pack(side=tk.LEFT, padx=5)
+
+        # 主题切换选择
+        ttk.Label(toolbar_frame, text="主题:").pack(side=tk.LEFT, padx=5)
+        theme_combobox = ttk.Combobox(
+            toolbar_frame,
+            textvariable=self.theme_var,
+            values=["alt", "clam", "default", "classic"]
+        )
+        theme_combobox.pack(side=tk.LEFT, padx=5)
+        theme_combobox.bind("<<ComboboxSelected>>", self.change_theme)
 
         # 左侧控制面板
         control_frame = ttk.LabelFrame(main_frame, text="攻击参数配置")
         control_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
 
         # 攻击方式选择
-        ttk.Label(control_frame, text="选择攻击方式:").pack(anchor=tk.W)
+        # ttk.Label(control_frame, text="请选择:").pack(anchor=tk.W, padx=5)
         self.attack_var = tk.StringVar()
         attack_combobox = ttk.Combobox(
             control_frame,
@@ -128,6 +173,14 @@ class RSADecryptTool:
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)
 
+    def change_theme(self, event=None):
+        style = ttk.Style()
+        style.theme_use(self.theme_var.get())
+
+    def open_github(self):
+        import webbrowser
+        webbrowser.open("https://github.com/TazmiDev/RsAbC")
+
     def update_parameters(self, event=None):
         # 清空现有参数
         for widget in self.param_frame.winfo_children():
@@ -146,7 +199,7 @@ class RSADecryptTool:
             frame.pack(fill=tk.X, pady=2)
 
             ttk.Label(frame, text=f"{param}:").pack(side=tk.LEFT)
-            entry = ttk.Entry(frame)
+            entry = ttk.Entry(frame, width=30)
             entry.pack(side=tk.RIGHT, fill=tk.X, expand=True)
             self.current_params.append(entry)
 
@@ -168,7 +221,6 @@ class RSADecryptTool:
     def show_result(self, text):
         self.result_text.delete(1.0, tk.END)
         self.result_text.insert(tk.END, text)
-
 
 if __name__ == "__main__":
     root = tk.Tk()

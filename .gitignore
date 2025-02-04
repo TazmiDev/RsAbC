@@ -1,0 +1,14 @@
+# Ignore node_modules directory
+rsaenv/
+node_modules/
+
+# Ignore log files
+*.log
+
+# Ignore build directories
+dist/
+build/
+
+# other ignores
+.idea/
+.vscode/

@@ -8,7 +8,7 @@ a = Analysis(
     datas = [
         ("attack_methods/*.py", "attack_methods"),
         ("utils/*.py", "utils"),
-        ("assets/*.ico", "assets")
+        ("assets/*.*", "assets")
     ],
     hiddenimports=[
         'attack_methods.基础解密',
@@ -20,6 +20,8 @@ a = Analysis(
         'attack_methods.Pollard分解',
         'attack_methods.已知pq求d',
         'attack_methods.中国剩余定理攻击',
+        'attack_methods.CRT快速解密',
+        'attack_methods.自动分解攻击'
     ],
     hookspath=[],
     hooksconfig={},
@@ -36,7 +38,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='RsAbC',
+    name='RsAbC-Windows-x86_64',
     icon='assets/app.ico',
     debug=False,
     bootloader_ignore_signals=False,
